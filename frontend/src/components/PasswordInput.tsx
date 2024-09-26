@@ -35,6 +35,7 @@ export function PasswordInput({ label }: oneLabelProps) {
       ) : (
         <>
           <div className="relative bottom-7 left-56 ">
+            {" "}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"

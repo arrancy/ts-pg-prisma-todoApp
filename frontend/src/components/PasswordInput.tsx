@@ -1,8 +1,7 @@
 // import { useState } from "react";
-import { oneLabelProps } from "./bigHeading";
 import { useState } from "react";
-
-export function PasswordInput({ label }: oneLabelProps) {
+import { inputFieldProps } from "./InputField";
+export function PasswordInput({ label, onChange }: inputFieldProps) {
   const [showPassword, setShowPassword] = useState(false);
   return (
     <>
@@ -13,6 +12,7 @@ export function PasswordInput({ label }: oneLabelProps) {
         type={showPassword ? "text" : "password"}
         className="block w-full p-2 text-gray-900 border rounded-lg bg-gray-50 text-xs focus:ring-2 focus:ring-sexyMaroon
            border-sexyPink  focus:border-sexyMaroon outline-none"
+        onChange={onChange}
       ></input>
       {showPassword ? (
         <>

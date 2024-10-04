@@ -6,6 +6,7 @@ import { SubHeading } from "../components/SubHeading";
 import { BottomHeading } from "../components/BottomHeading";
 import { Button } from "../components/Button";
 import { useState } from "react";
+import { redirect } from "react-router-dom";
 export function Signup() {
   const [signupInput, setsignupInput] = useState({
     firstName: "",
@@ -13,6 +14,8 @@ export function Signup() {
     username: "",
     password: "",
   });
+  const [ifError, setIfError] = useState<Boolean>(false);
+
   return (
     <>
       <div className="flex items-center justify-center h-screen mx-auto">
@@ -56,13 +59,20 @@ export function Signup() {
                     body: JSON.stringify(signupInput),
                   }
                 );
+
                 const data = await response.json();
+                if (!response.ok) {
+                }
                 localStorage.setItem("jwtToken", data.token);
+                redirect("/dashboard");
               } catch (error) {
                 console.log(error);
+                setIfError(true);
               }
             }}
           ></Button>
+
+          {ifError && <p className="text-red"> error signing in </p>}
           <BottomHeading action={"sign in"} redirectLink="/signin">
             already have an account ? click here to
           </BottomHeading>

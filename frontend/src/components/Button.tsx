@@ -1,7 +1,7 @@
-interface ButtonProps {
-  label: string;
-  onClick: () => any;
-}
+type ButtonProps = {
+  label: string | JSX.Element;
+  onClick: () => void;
+};
 export function Button({ label, onClick }: ButtonProps) {
   return (
     <button

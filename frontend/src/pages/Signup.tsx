@@ -15,6 +15,8 @@ export function Signup() {
     password: "",
   });
   const [ifError, setIfError] = useState<Boolean>(false);
+  const [isEmpty, setIsEmpty] = useState<Boolean>(false);
+  const [invalidMessage, setInvalidMessage] = useState<string>("");
 
   return (
     <>
@@ -48,22 +50,39 @@ export function Signup() {
               setsignupInput({ ...signupInput, password: event.target.value });
             }}
           ></PasswordInput>
+          {isEmpty && <p>all fields are compulsory</p>}
+          {invalidMessage && <p>{invalidMessage}</p>}
           <Button
             label={"sign up"}
             onClick={async () => {
+              const { username, password, firstName, lastName } = signupInput;
+              if (!(username && password && firstName && lastName)) {
+                setIsEmpty(true);
+                setTimeout(() => {
+                  setIsEmpty(false);
+                }, 5000);
+                return;
+              }
+
               try {
                 const response = await fetch(
                   "http://localhost:4000/api/v1/user/signup",
                   {
                     method: "POST",
                     body: JSON.stringify(signupInput),
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
                   }
                 );
 
-                const data = await response.json();
                 if (!response.ok) {
+                  const data = await response.json();
+                  setInvalidMessage(data.msg);
+                  return;
                 }
-                localStorage.setItem("jwtToken", data.token);
+                const recievedData = await response.json();
+                localStorage.setItem("jwtToken", recievedData.token);
                 redirect("/dashboard");
               } catch (error) {
                 console.log(error);

@@ -22,7 +22,7 @@ export function Signin() {
   const [isEmptyMessageDisplaying, setIsEmptyMessageDisplaying] =
     useState<boolean>(false);
   const [hasError, setHasError] = useState<boolean>(false);
-  const [errorValue, setErrorValue] = useState<any>("");
+  const [errorValue, setErrorValue] = useState<string | null>(null);
   const [isSomethingInvalid, setIsSomethingInvalid] = useState<boolean>(false);
   const [invalidStuff, setInvalidStuff] = useState<string>("");
   const [waiting, setWaiting] = useState<boolean>(false);
@@ -70,31 +70,48 @@ export function Signin() {
                     headers: { "Content-Type": "application/json" },
                   }
                 );
-                const data = await response.json();
-                setWaiting(false);
 
                 if (!response.ok) {
+                  const data = await response.json();
                   setInvalidStuff(data.msg);
-
                   setIsSomethingInvalid(true);
                   return;
                 }
+
+                const recievedData = await response.json();
+                const jwt = recievedData.token;
+                localStorage.setItem("jwt", jwt);
                 navigate("/dashboard");
-              } catch (error) {
-                setWaiting(false);
-                console.log(error);
-                setHasError(true);
-                setErrorValue(error);
+              } catch (error: unknown) {
+                if (error instanceof Error) {
+                  if (
+                    error.name === "TypeError" &&
+                    error.message === "Failed to fetch"
+                  ) {
+                    setHasError(true);
+                    setErrorValue(
+                      "The backend server is unreachable. Please try again later."
+                    );
+                  } else {
+                    setHasError(true);
+                    setErrorValue(error.message || "An unknown error occurred");
+                  }
+                } else {
+                  setHasError(true);
+                  setErrorValue("an unknown error occured");
+                }
+                // Check if the error is due to network failure or server down
               } finally {
-                setWaiting(false); // Ensure waiting is reset regardless of success or error
+                setWaiting(false);
               }
             }}
           ></Button>
+
           {isEmptyMessageDisplaying && (
             <p className="text-center">please fill up your credentials</p>
           )}
           {hasError && (
-            <p className="text-red">an error occured :{errorValue}</p>
+            <p className="text-red">an error occured : {errorValue}</p>
           )}
           {isSomethingInvalid && <p className="text-red">{invalidStuff}</p>}
           <BottomHeading redirectLink={"/signup"} action={"sign up"}>

@@ -39,6 +39,42 @@ todoRouter.post("/", authMiddleware, async (req: Request, res: Response) => {
     res.status(statusCodes.serverSideError).json({ msg: "an error occured" });
   }
 });
+todoRouter.put("/done", authMiddleware, async (req: Request, res: Response) => {
+  const { success } = todoUpdateSchema.safeParse(req.body);
+  if (!success) {
+    return res
+      .status(statusCodes.invalidInputs)
+      .json({ msg: "invalid inputs" });
+  }
+  const todoExists = await prisma.todo.findUnique({
+    where: {
+      id: req.body.id,
+      user_id: (req as CustomRequest).user.id,
+    },
+  });
+  if (!todoExists) {
+    return res.status(statusCodes.notFound).json({
+      msg: "todo not found/does not belong",
+    });
+  }
+  try {
+    const updatedTodo = await prisma.todo.update({
+      where: {
+        id: req.body.id,
+        user_id: (req as CustomRequest).user.id,
+      },
+      data: {
+        done: true,
+      },
+    });
+    res.status(statusCodes.ok).json({ msg: "todo marked as done." });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(statusCodes.serverSideError)
+      .json({ msg: "unknown error occured" });
+  }
+});
 todoRouter.put("/", async (req: Request, res: Response) => {
   const { success } = todoUpdateSchema.safeParse(req.body);
   if (!success) {

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { inputFieldProps } from "./InputField";
 export function PasswordInput({ label, onChange }: inputFieldProps) {
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   return (
     <>
       <label className="block mb-2 text-sm font-medium text-sexyMaroon">

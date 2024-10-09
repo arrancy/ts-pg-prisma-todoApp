@@ -5,10 +5,10 @@ export interface inputFieldProps {
 export function InputField({ label, onChange }: inputFieldProps) {
   return (
     <>
-      <div>
+      <div className="my-2">
         <label
           htmlFor="small-input"
-          className="block mb-2 text-sm font-medium text-sexyMaroon dark:text-white"
+          className="block mb-2 text-sm font-medium text-sexyMaroon"
         >
           {label}
         </label>

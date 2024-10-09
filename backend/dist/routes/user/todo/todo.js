@@ -50,6 +50,43 @@ exports.todoRouter.post("/", authMiddleware_1.authMiddleware, (req, res) => __aw
         res.status(UserRouter_1.statusCodes.serverSideError).json({ msg: "an error occured" });
     }
 }));
+exports.todoRouter.put("/done", authMiddleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { success } = todoUpdate_1.todoUpdateSchema.safeParse(req.body);
+    if (!success) {
+        return res
+            .status(UserRouter_1.statusCodes.invalidInputs)
+            .json({ msg: "invalid inputs" });
+    }
+    const todoExists = yield prisma.todo.findUnique({
+        where: {
+            id: req.body.id,
+            user_id: req.user.id,
+        },
+    });
+    if (!todoExists) {
+        return res.status(UserRouter_1.statusCodes.notFound).json({
+            msg: "todo not found/does not belong",
+        });
+    }
+    try {
+        const updatedTodo = yield prisma.todo.update({
+            where: {
+                id: req.body.id,
+                user_id: req.user.id,
+            },
+            data: {
+                done: true,
+            },
+        });
+        res.status(UserRouter_1.statusCodes.ok).json({ msg: "todo marked as done." });
+    }
+    catch (error) {
+        console.log(error);
+        return res
+            .status(UserRouter_1.statusCodes.serverSideError)
+            .json({ msg: "unknown error occured" });
+    }
+}));
 exports.todoRouter.put("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { success } = todoUpdate_1.todoUpdateSchema.safeParse(req.body);
     if (!success) {

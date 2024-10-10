@@ -1,5 +1,6 @@
 import { Button } from "./Button";
 import { useState, useCallback } from "react";
+import { InputField } from "./InputField";
 export interface TodoProp {
   id: number;
   title: string;
@@ -8,6 +9,15 @@ export interface TodoProp {
 }
 
 export function Todo({ title, description, id, done }: TodoProp) {
+  const [initialTodoTitle, setInitialTodoTitle] = useState<string>(title);
+  const [initialTodoDescription, setInitialTodoDescription] =
+    useState<string>(description);
+  const [updatedTodoTitle, setUpdatedTodoTitle] = useState<string>(title);
+  const [updatedTodoDescription, setUpdatedTodoDescription] =
+    useState<string>(description);
+  const [backupTitle, setBackupTitle] = useState<string>("");
+  const [backupDescription, setBackupDescription] = useState<string>("");
+  const [todoId, setTodoId] = useState<number>(id);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const [hasError, setHasError] = useState<boolean>(false);
   const [errorValue, setErrorValue] = useState<string | null>(null);
@@ -16,15 +26,55 @@ export function Todo({ title, description, id, done }: TodoProp) {
   const [invalidMessage, setInvalidMessage] = useState<string>("");
   const [isDone, setIsDone] = useState<boolean>(done);
   const [doneMessage, setDoneMessage] = useState<string | null>(null);
+  const [updatedMessage, setUpdatedMessage] = useState<string>("");
 
-  const handleRequestError = useCallback((errorMessage: string) => {
-    setErrorValue(errorMessage);
-    setHasError(true);
-    setIsDone(false);
-    setTimeout(() => {
-      setErrorValue("");
-    }, 3000);
+  const updateTodo = useCallback(async () => {
+    if (
+      !(
+        initialTodoDescription === updatedTodoDescription &&
+        initialTodoTitle === updatedTodoTitle
+      )
+    ) {
+      setBackupTitle(initialTodoTitle);
+      setBackupDescription(initialTodoDescription);
+      setInitialTodoTitle(updatedTodoTitle);
+      setInitialTodoDescription(updatedTodoDescription);
+      setIsUpdating(!isUpdating);
+      try {
+        const jwt = localStorage.getItem("jwt");
+        const response = await fetch("http://localhost:4000/api/v1/user/todo", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + jwt,
+          },
+          body: JSON.stringify({
+            id: id,
+            title: updatedTodoTitle,
+            description: updatedTodoDescription,
+          }),
+        });
+        if (!response.ok) {
+          const data = await response.json();
+          setIsInvalidOrNonExistent(true);
+          setInvalidMessage("could not update todo : " + data.msg);
+          setInitialTodoTitle(backupTitle);
+          setInitialTodoDescription(backupDescription);
+          return;
+        }
+        const data = await response.json();
+        setUpdatedMessage(data.msg);
+        setBackupTitle(initialTodoTitle);
+        setBackupDescription(initialTodoDescription);
+        setTimeout(() => {
+          setUpdatedMessage("");
+        }, 3000);
+      } catch (error: unknown) {
+        handleCatch(error, handleRequestErrorForUpdate);
+      }
+    }
   }, []);
+
   const markTodoDone = useCallback(async () => {
     setIsDone(true);
     const jwt = localStorage.getItem("jwt");
@@ -54,39 +104,93 @@ export function Todo({ title, description, id, done }: TodoProp) {
         setDoneMessage("");
       }, 3000);
     } catch (error: unknown) {
+      handleCatch(error, handleRequestErrorForDone);
+    }
+  }, []);
+
+  const handleRequestErrorForDone = useCallback((errorMessage: string) => {
+    setErrorValue(errorMessage);
+    setHasError(true);
+    setIsDone(false);
+    setTimeout(() => {
+      setErrorValue("");
+    }, 3000);
+  }, []);
+  const handleRequestErrorForUpdate = useCallback((errorMessage: string) => {
+    setErrorValue(errorMessage);
+    setHasError(true);
+    setInitialTodoTitle(backupTitle);
+    setInitialTodoDescription(backupDescription);
+    setTimeout(() => {
+      setErrorValue("");
+    }, 3000);
+  }, []);
+  const handleCatch = useCallback(
+    (error: unknown, errorHandler: (errorMessage: string) => void) => {
       if (error instanceof Error) {
         if (error.name === "TypeError" && error.message === "Failed to fetch") {
           setHasError(true);
           setErrorValue(
             "The backend server is unreachable. Please try again later."
           );
-          handleRequestError("backend server down");
+          errorHandler("backend server down");
         } else {
-          handleRequestError(error.message || "an unknown error occured");
+          errorHandler(error.message || "an unknown error occured");
         }
       } else {
-        handleRequestError("an unknown error occured");
+        errorHandler("an unknown error occured");
       }
-      // Check if the error is due to network failure or server down
-    }
-  }, []);
+    },
+    []
+  );
 
   if (!isDone) {
     return (
       <>
-        <div className=" flex gap-6 rounded-xl border-4 border-sexyMaroon px-6 pb-4 pt-2 mx-8 transition-all ease-in-out duration-300 my-4 hover:scale-105">
+        <div className=" animate-fadeIn flex gap-6 rounded-xl border-4 border-sexyMaroon px-6 pb-4 pt-2 mx-8 transition-all ease-in-out duration-300 my-4 hover:scale-105">
           <div className="basis-full ">
-            <div className="text-2xl text-sexyMaroon font-bold">{title}</div>
-            <div className="text-l text-sexyPink font-semibold text-opacity-75">
-              {description}
-            </div>
+            {isUpdating ? (
+              <>
+                <InputField
+                  label="title"
+                  value={updatedTodoTitle}
+                  onChange={(event) => {
+                    setUpdatedTodoTitle(event.target.value);
+                  }}
+                ></InputField>
+                <InputField
+                  label="description"
+                  value={updatedTodoDescription}
+                  onChange={(event) => {
+                    setUpdatedTodoDescription(event.target.value);
+                  }}
+                ></InputField>
+              </>
+            ) : (
+              <>
+                <div className="text-2xl text-sexyMaroon font-bold">
+                  {initialTodoTitle}
+                </div>
+                <div className="text-l text-sexyPink font-semibold text-opacity-75">
+                  {initialTodoDescription}
+                </div>
+                {updatedMessage && <p>{updatedMessage}</p>}
+              </>
+            )}
+
             {hasError ? (
               <p>{errorValue}</p>
             ) : isInvalidOrNonExistent ? (
               <p>{invalidMessage}</p>
             ) : null}
           </div>
-          <div className="mt-6">
+          <div
+            className={
+              isUpdating
+                ? "mt-12 transition-all duration-200 ease-in-out"
+                : "mt-6 transition-all duration-200 ease-in-out"
+            }
+          >
             <Button
               onClick={() => {
                 setIsUpdating(!isUpdating);
@@ -95,13 +199,7 @@ export function Todo({ title, description, id, done }: TodoProp) {
             ></Button>
             <Button
               label={isUpdating ? "confirm" : "mark as done"}
-              onClick={
-                isUpdating
-                  ? () => {
-                      return;
-                    }
-                  : markTodoDone
-              }
+              onClick={isUpdating ? updateTodo : markTodoDone}
             ></Button>
           </div>
         </div>

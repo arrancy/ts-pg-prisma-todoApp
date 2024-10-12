@@ -5,8 +5,9 @@ import { BigHeading } from "../components/bigHeading";
 import { SubHeading } from "../components/SubHeading";
 import { BottomHeading } from "../components/BottomHeading";
 import { Button } from "../components/Button";
+import { LoadingSpinner } from "../components/LoadingSpinner";
 import { useState } from "react";
-import { redirect } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 export function Signup() {
   const [signupInput, setsignupInput] = useState({
     firstName: "",
@@ -15,8 +16,12 @@ export function Signup() {
     password: "",
   });
   const [ifError, setIfError] = useState<Boolean>(false);
-  const [isEmpty, setIsEmpty] = useState<Boolean>(false);
+
   const [invalidMessage, setInvalidMessage] = useState<string>("");
+
+  const [isEmpty, setIsEmpty] = useState<Boolean>(false);
+  const [isWaiting, setIsWaiting] = useState<Boolean>(false);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -28,24 +33,28 @@ export function Signup() {
           </FullHeading>
           <InputField
             label={"first name"}
+            value={signupInput.firstName}
             onChange={(event) => {
               setsignupInput({ ...signupInput, firstName: event.target.value });
             }}
           ></InputField>
           <InputField
             label={"last name"}
+            value={signupInput.lastName}
             onChange={(event) => {
               setsignupInput({ ...signupInput, lastName: event.target.value });
             }}
           ></InputField>
           <InputField
             label={"username"}
+            value={signupInput.username}
             onChange={(event) => {
               setsignupInput({ ...signupInput, username: event.target.value });
             }}
           ></InputField>
           <PasswordInput
             label={"password"}
+            value={signupInput.password}
             onChange={(event) => {
               setsignupInput({ ...signupInput, password: event.target.value });
             }}
@@ -53,7 +62,7 @@ export function Signup() {
           {isEmpty && <p>all fields are compulsory</p>}
           {invalidMessage && <p>{invalidMessage}</p>}
           <Button
-            label={"sign up"}
+            label={isWaiting ? <LoadingSpinner /> : "sign up"}
             onClick={async () => {
               const { username, password, firstName, lastName } = signupInput;
               if (!(username && password && firstName && lastName)) {
@@ -63,7 +72,7 @@ export function Signup() {
                 }, 5000);
                 return;
               }
-
+              setIsWaiting(true);
               try {
                 const response = await fetch(
                   "http://localhost:4000/api/v1/user/signup",
@@ -83,10 +92,25 @@ export function Signup() {
                 }
                 const recievedData = await response.json();
                 localStorage.setItem("jwtToken", recievedData.token);
-                redirect("/dashboard");
-              } catch (error) {
-                console.log(error);
-                setIfError(true);
+                navigate("/dashboard");
+              } catch (error: unknown) {
+                if (error instanceof Error) {
+                  if (
+                    error.name === "TypeError" &&
+                    error.message === "Failed to fetch"
+                  ) {
+                    setIfError(true);
+                    setInvalidMessage("server is down hence unreachable");
+                  } else {
+                    setIfError(true);
+                    setInvalidMessage(error.message);
+                  }
+                } else {
+                  setIfError(true);
+                  setInvalidMessage("an error occured");
+                }
+              } finally {
+                setIsWaiting(false);
               }
             }}
           ></Button>

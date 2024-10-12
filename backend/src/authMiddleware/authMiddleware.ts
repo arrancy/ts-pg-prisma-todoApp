@@ -4,6 +4,7 @@ import { JwtPayload } from "jsonwebtoken";
 import "dotenv/config";
 import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET;
+
 export interface CustomRequest extends Request {
   user: JwtPayload;
 }
@@ -12,7 +13,6 @@ export function authMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  console.log("request till here");
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {

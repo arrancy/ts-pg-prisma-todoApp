@@ -36,6 +36,7 @@ export function Signin() {
           </FullHeading>
           <InputField
             label={"username"}
+            value={signinInput.username}
             onChange={(event) => {
               const currentInput: string = event.target.value;
 
@@ -44,6 +45,7 @@ export function Signin() {
           ></InputField>
           <PasswordInput
             label={"password"}
+            value={signinInput.password}
             onChange={(event) => {
               const currentInput: string = event.target.value;
 

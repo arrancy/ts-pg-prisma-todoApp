@@ -1,5 +1,4 @@
 import { Request, Response, Router } from "express";
-import express from "express";
 import { authMiddleware } from "../../../authMiddleware/authMiddleware";
 import { PrismaClient } from "@prisma/client";
 import { CustomRequest } from "../../../authMiddleware/authMiddleware";

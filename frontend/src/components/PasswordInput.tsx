@@ -1,7 +1,7 @@
 // import { useState } from "react";
 import { useState } from "react";
 import { inputFieldProps } from "./InputField";
-export function PasswordInput({ label, onChange }: inputFieldProps) {
+export function PasswordInput({ label, onChange, value }: inputFieldProps) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   return (
     <>
@@ -12,6 +12,7 @@ export function PasswordInput({ label, onChange }: inputFieldProps) {
         type={showPassword ? "text" : "password"}
         className="block w-full p-2 text-gray-900 border rounded-lg bg-gray-50 text-xs focus:ring-2 focus:ring-sexyMaroon
            border-sexyPink  focus:border-sexyMaroon outline-none"
+        value={value}
         onChange={onChange}
       ></input>
       {showPassword ? (

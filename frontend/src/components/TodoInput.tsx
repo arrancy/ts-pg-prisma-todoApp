@@ -39,3 +39,12 @@ export function TodoInput() {
     </>
   );
 }
+
+// how would i do it in case of atom family
+// so in the todo component the main todo state will be governed by the atom we get from the todo family,
+// id being the one we receive from the props
+// on the dashboard component, we want to display todos as components dynamically of course we will use array.map
+// the original todo array would definitely have to be retrieved from the endpoint which gives us all the todos
+// it gets rendered initially as it passes every id to every dynamically created todo component,
+// the initial todoArray will stay the same now and everything will be handled by individual todo components
+// only on refreshes or page reloads will the original todo array be recalculated from the backend

@@ -6,12 +6,21 @@ export interface TodoInputFormat {
   title: string;
   description: string;
 }
+interface errorStateFormat {
+  hasError: boolean;
+  errorMessage: string;
+}
 
 export function TodoInput() {
   const [TodoInput, setTodoInput] = useState<TodoInputFormat>({
     title: "",
     description: "",
   });
+  const [errorState, setErrorState] = useState<errorStateFormat>({
+    hasError: false,
+    errorMessage: "",
+  });
+  const [addedMessage, setAddedMessage] = useState<string>("");
   return (
     <>
       <div className="md:flex gap-6 rounded-xl border-4 border-sexyMaroon px-6 pb-4 pt-2 mx-8 transition-all ease-in-out duration-300 hover:scale-105 my-2 ">
@@ -33,8 +42,65 @@ export function TodoInput() {
           ></InputField>
         </div>
         <div className="mt-14">
-          <Button label={"add todo"} onClick={() => {}}></Button>
+          <Button
+            label={"add todo"}
+            onClick={async () => {
+              const token = localStorage.getItem("jwt");
+              try {
+                const response = await fetch("http://localhost:4000", {
+                  method: "POST",
+                  body: JSON.stringify(TodoInput),
+                  headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token,
+                  },
+                });
+                if (!response.ok) {
+                  const data = await response.json();
+                  setErrorState({
+                    hasError: true,
+                    errorMessage: "unable to add todo : " + data.msg,
+                  });
+                  return;
+                }
+                const data = await response.json();
+                setAddedMessage(data.msg);
+              } catch (error) {
+                setErrorState({ ...errorState, hasError: true });
+                if (error instanceof Error) {
+                  if (
+                    error.name === "TypeError" &&
+                    error.message === "Failed to fetch"
+                  ) {
+                    setErrorState({
+                      ...errorState,
+                      errorMessage: "server is down, failed to add todo",
+                    });
+                  } else {
+                    setErrorState({
+                      ...errorState,
+                      errorMessage:
+                        "failed to add todo, an error occured : " +
+                        error.message,
+                    });
+                  }
+                } else {
+                  setErrorState({
+                    ...errorState,
+                    errorMessage: "an unknown error occured",
+                  });
+                }
+              }
+            }}
+          ></Button>
         </div>
+      </div>
+      <div>
+        {addedMessage
+          ? addedMessage
+          : errorState.hasError
+          ? errorState.errorMessage
+          : null}
       </div>
     </>
   );

@@ -45,7 +45,6 @@ export function Todo({ title, description, id, done }: TodoProp) {
       setHasError(true);
       setInitialTodoTitle(backupTitle);
       setInitialTodoDescription(backupDescription);
-      console.log(initialTodoTitle);
 
       setTimeout(() => {
         setErrorValue("");

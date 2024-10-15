@@ -1,7 +1,7 @@
 import { LargeHeading } from "../components/LargeHeading";
 import { TodoInput } from "../components/TodoInput";
 import { TodoWrapper } from "../components/TodoWrapper";
-import { Todo } from "../components/Todo";
+import { Todo, TodoProp } from "../components/Todo";
 import { useRecoilValueLoadable } from "recoil";
 import { todosAtom } from "../store/atoms/todosAtom";
 import { LoadingSpinner } from "../components/LoadingSpinner";
@@ -25,7 +25,7 @@ export function DashBoard() {
             ) : todos.state === "hasError" ? (
               "error fetching todos"
             ) : todos.state === "hasValue" ? (
-              todos.map((todo) => (
+              todos.contents.map((todo: TodoProp) => (
                 <Todo
                   title={todo.title}
                   key={todo.id}
@@ -34,7 +34,9 @@ export function DashBoard() {
                   done={todo.done}
                 ></Todo>
               ))
-            ): ""}
+            ) : (
+              ""
+            )}
             {/* <Todo
               title="hello"
               description="world  slkjdfdsljaslkjdfdsljaslkjdfdsljaslkjdfdsljaslkjdfdsljaslkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja"

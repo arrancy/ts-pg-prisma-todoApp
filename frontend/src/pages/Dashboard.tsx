@@ -2,8 +2,12 @@ import { LargeHeading } from "../components/LargeHeading";
 import { TodoInput } from "../components/TodoInput";
 import { TodoWrapper } from "../components/TodoWrapper";
 import { Todo } from "../components/Todo";
+import { useRecoilValueLoadable } from "recoil";
+import { todosAtom } from "../store/atoms/todosAtom";
+import { LoadingSpinner } from "../components/LoadingSpinner";
 
 export function DashBoard() {
+  const todos = useRecoilValueLoadable(todosAtom);
   return (
     <>
       <div className="relative h-screen w-screen bg-sexyCream py-4">
@@ -15,12 +19,28 @@ export function DashBoard() {
           <LargeHeading label="your todos" />
           <TodoWrapper>
             <TodoInput />
-            <Todo
+
+            {todos.state === "loading" ? (
+              <LoadingSpinner></LoadingSpinner>
+            ) : todos.state === "hasError" ? (
+              "error fetching todos"
+            ) : todos.state === "hasValue" ? (
+              todos.map((todo) => (
+                <Todo
+                  title={todo.title}
+                  key={todo.id}
+                  description={todo.description}
+                  id={todo.id}
+                  done={todo.done}
+                ></Todo>
+              ))
+            ): ""}
+            {/* <Todo
               title="hello"
               description="world  slkjdfdsljaslkjdfdsljaslkjdfdsljaslkjdfdsljaslkjdfdsljaslkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja"
               done={false}
               id={1}
-            ></Todo>
+            ></Todo> */}
           </TodoWrapper>
         </div>
       </div>

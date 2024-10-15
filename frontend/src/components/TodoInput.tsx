@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { Button } from "./Button";
 import { InputField } from "./InputField";
+import { useRecoilState } from "recoil";
+import { todosAtom } from "../store/atoms/todosAtom";
 
 export interface TodoInputFormat {
   title: string;
   description: string;
+  done: boolean;
+  id: null | number;
 }
 interface errorStateFormat {
   hasError: boolean;
@@ -15,12 +19,15 @@ export function TodoInput() {
   const [TodoInput, setTodoInput] = useState<TodoInputFormat>({
     title: "",
     description: "",
+    done: false,
+    id: null,
   });
   const [errorState, setErrorState] = useState<errorStateFormat>({
     hasError: false,
     errorMessage: "",
   });
   const [addedMessage, setAddedMessage] = useState<string>("");
+  const [todos, setTodos] = useRecoilState(todosAtom);
   return (
     <>
       <div className="md:flex gap-6 rounded-xl border-4 border-sexyMaroon px-6 pb-4 pt-2 mx-8 transition-all ease-in-out duration-300 hover:scale-105 my-2 ">
@@ -45,6 +52,10 @@ export function TodoInput() {
           <Button
             label={"add todo"}
             onClick={async () => {
+              const uniqueId = Date.now() + Math.floor(Math.random() * 100000);
+              setTodoInput({ ...TodoInput, id: uniqueId });
+              setTodos([...todos, TodoInput]);
+
               const token = localStorage.getItem("jwt");
               try {
                 const response = await fetch("http://localhost:4000", {
@@ -64,6 +75,23 @@ export function TodoInput() {
                   return;
                 }
                 const data = await response.json();
+                const currentTodo = todos.find((todo) => (todo.id = uniqueId));
+
+                if (!currentTodo) {
+                  setErrorState({
+                    hasError: true,
+                    errorMessage: "an unknown error occured",
+                  });
+                  return;
+                }
+                const indexOfCurrentTodo = todos.indexOf(currentTodo);
+                currentTodo.id = data.todoId;
+                setTodos((prevState) => {
+                  const updatedState = [...prevState];
+                  updatedState[indexOfCurrentTodo] = currentTodo;
+                  return updatedState;
+                });
+
                 setAddedMessage(data.msg);
               } catch (error) {
                 setErrorState({ ...errorState, hasError: true });

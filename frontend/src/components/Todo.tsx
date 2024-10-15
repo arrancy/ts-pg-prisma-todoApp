@@ -2,7 +2,7 @@ import { Button } from "./Button";
 import { useState, useCallback, useEffect } from "react";
 import { InputField } from "./InputField";
 export interface TodoProp {
-  id: number;
+  id: null | number;
   title: string;
   description: string;
   done: boolean;

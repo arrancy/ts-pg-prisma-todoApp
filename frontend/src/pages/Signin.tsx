@@ -6,7 +6,7 @@ import { SubHeading } from "../components/SubHeading";
 import { BottomHeading } from "../components/BottomHeading";
 import { Button } from "../components/Button";
 import { LoadingSpinner } from "../components/LoadingSpinner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface signinInput {
@@ -15,6 +15,40 @@ interface signinInput {
 }
 export function Signin() {
   const navigate = useNavigate();
+  useEffect(() => {
+    amIAuthenticated();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  async function amIAuthenticated() {
+    try {
+      const token = localStorage.getItem("jwt");
+      if (!token) {
+        return;
+      }
+      const response = await fetch("http://localhost:4000/me", {
+        headers: {
+          "Authorization": "Bearer " + token,
+        },
+      });
+      const data = await response.json();
+      if (data.isLoggedIn) {
+        navigate("/dashboard");
+        return;
+      } else {
+        return;
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.name === "TypeError" && error.message === "Failed to fetch") {
+          return;
+        } else {
+          return;
+        }
+      } else {
+        return;
+      }
+    }
+  }
   const [signinInput, setSigninInput] = useState<signinInput>({
     username: "",
     password: "",

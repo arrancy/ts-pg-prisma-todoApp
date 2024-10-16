@@ -48,7 +48,7 @@ export function TodoInput() {
             onChange={(event) => {
               setTodoInput({ ...TodoInput, description: event.target.value });
             }}
-            value={TodoInput.title}
+            value={TodoInput.description}
           ></InputField>
         </div>
         <div className="mt-14">
@@ -61,14 +61,17 @@ export function TodoInput() {
 
               const token = localStorage.getItem("jwt");
               try {
-                const response = await fetch("http://localhost:4000", {
-                  method: "POST",
-                  body: JSON.stringify(TodoInput),
-                  headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + token,
-                  },
-                });
+                const response = await fetch(
+                  "http://localhost:4000/api/v1/user/todo",
+                  {
+                    method: "POST",
+                    body: JSON.stringify(TodoInput),
+                    headers: {
+                      "Content-Type": "application/json",
+                      "Authorization": "Bearer " + token,
+                    },
+                  }
+                );
                 if (!response.ok) {
                   const data = await response.json();
                   setErrorState({

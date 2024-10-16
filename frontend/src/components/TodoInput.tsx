@@ -14,6 +14,9 @@ interface errorStateFormat {
   hasError: boolean;
   errorMessage: string;
 }
+function clearMessage(stateFunction: () => void) {
+  setTimeout(stateFunction, 3000);
+}
 
 export function TodoInput() {
   const [TodoInput, setTodoInput] = useState<TodoInputFormat>({
@@ -93,6 +96,9 @@ export function TodoInput() {
                 });
 
                 setAddedMessage(data.msg);
+                clearMessage(() => {
+                  setAddedMessage("");
+                });
               } catch (error) {
                 setErrorState({ ...errorState, hasError: true });
                 if (error instanceof Error) {
@@ -104,6 +110,9 @@ export function TodoInput() {
                       ...errorState,
                       errorMessage: "server is down, failed to add todo",
                     });
+                    clearMessage(() => {
+                      setErrorState({ ...errorState, errorMessage: "" });
+                    });
                   } else {
                     setErrorState({
                       ...errorState,
@@ -111,11 +120,17 @@ export function TodoInput() {
                         "failed to add todo, an error occured : " +
                         error.message,
                     });
+                    clearMessage(() => {
+                      setErrorState({ ...errorState, errorMessage: "" });
+                    });
                   }
                 } else {
                   setErrorState({
                     ...errorState,
                     errorMessage: "an unknown error occured",
+                  });
+                  clearMessage(() => {
+                    setErrorState({ ...errorState, errorMessage: "" });
                   });
                 }
               }

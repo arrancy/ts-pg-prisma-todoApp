@@ -3,6 +3,9 @@ import { TodoInputFormat } from "../../components/TodoInput";
 
 async function getTodos(): Promise<TodoInputFormat[]> {
   const token = localStorage.getItem("jwt");
+  if (!token) {
+    return [];
+  }
   const response = await fetch("http://localhost:4000/api/v1/user/todo", {
     headers: {
       "Authorization": "Bearer " + token,

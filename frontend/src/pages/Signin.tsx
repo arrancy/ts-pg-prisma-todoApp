@@ -115,9 +115,14 @@ export function Signin() {
                 }
 
                 const recievedData = await response.json();
-                const jwt = recievedData.token;
-                localStorage.setItem("jwt", jwt);
-                navigate("/dashboard");
+                const token = recievedData.token;
+                localStorage.setItem("jwt", token);
+                console.log(token);
+                setTimeout(() => {
+                  setWaiting(false);
+                  navigate("/dashboard");
+                }, 100);
+                return;
               } catch (error: unknown) {
                 if (error instanceof Error) {
                   if (

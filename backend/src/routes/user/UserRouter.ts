@@ -23,6 +23,7 @@ userRouter.use(express.json());
 const prisma = new PrismaClient();
 userRouter.post("/signup", async (req: Request, res: Response) => {
   const { success } = signupSchema.safeParse(req.body);
+  console.log(req.body);
   if (!success) {
     return res
       .status(statusCodes.invalidInputs)

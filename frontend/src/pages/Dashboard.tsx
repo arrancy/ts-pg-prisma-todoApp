@@ -7,10 +7,13 @@ import { todosAtom } from "../store/atoms/todosAtom";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { LogoutButton } from "../components/LogoutButton";
 
 export function DashBoard() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const navigate = useNavigate();
+  const todos = useRecoilValueLoadable(todosAtom);
+
   useEffect(() => {
     amIAuthenticated();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -32,22 +35,14 @@ export function DashBoard() {
         navigate("/signin");
         return;
       }
-    } catch (error) {
-      if (error instanceof Error) {
-        if (error.name === "TypeError" && error.message === "Failed to fetch") {
-          setIsLoggedIn(false);
-          navigate("/signin");
-          return;
-        } else {
-          setIsLoggedIn(false);
-          navigate("/signin");
-          return;
-        }
-      }
+    } catch (error: unknown) {
+      console.log(error);
+
+      setIsLoggedIn(false);
+      navigate("/signin");
     }
   }
 
-  const todos = useRecoilValueLoadable(todosAtom);
   return (
     isLoggedIn && (
       <>
@@ -57,6 +52,7 @@ export function DashBoard() {
 
           {/* Content layer that is not affected by the brightness */}
           <div className="relative z-10">
+            <LogoutButton></LogoutButton>
             <LargeHeading label="your todos" />
             <TodoWrapper>
               <TodoInput />
@@ -70,7 +66,7 @@ export function DashBoard() {
                   <Todo
                     title={todo.title}
                     key={todo.id}
-                    description={todo.description}
+                    description={todo.description || "description unavailable"}
                     id={todo.id}
                     done={todo.done}
                   ></Todo>

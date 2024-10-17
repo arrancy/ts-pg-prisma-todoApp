@@ -10,7 +10,8 @@ const app: Express = express();
 app.use(cors());
 app.use(express.json());
 app.use("/api/v1", rootRouter);
-app.get("/me", authMiddleware, (req: Request, res: Response) => {
+app.get("/me", (req: Request, res: Response) => {
+  console.log("request reached here");
   if (!req.headers.authorization) {
     return res.status(401).json({
       isLoggedIn: false,

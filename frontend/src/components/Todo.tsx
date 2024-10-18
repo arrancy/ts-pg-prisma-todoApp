@@ -53,6 +53,14 @@ export function Todo({ title, description, id, done }: TodoProp) {
     },
     [backupTitle, backupDescription]
   );
+  const handleRequestErrorForDelete = useCallback((errorMessage: string) => {
+    setErrorValue(errorMessage || "an unknown error occured");
+    setHasError(true);
+    setIsDone(false);
+    setTimeout(() => {
+      setErrorValue("");
+    }, 3000);
+  }, []);
   const handleCatch = useCallback(
     (error: unknown, errorHandler: (errorMessage: string) => void) => {
       if (error instanceof Error) {
@@ -141,18 +149,21 @@ export function Todo({ title, description, id, done }: TodoProp) {
     setIsDone(true);
     const jwt = localStorage.getItem("jwt");
     try {
-      const response = await fetch("http://localhost:4000/api/v1/user/todo", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + jwt,
-        },
-        body: JSON.stringify({
-          id: id,
-          title: title,
-          description: description,
-        }),
-      });
+      const response = await fetch(
+        "http://localhost:4000/api/v1/user/todo/done",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + jwt,
+          },
+          body: JSON.stringify({
+            id: id,
+            title: title,
+            description: description,
+          }),
+        }
+      );
       if (!response.ok) {
         const data = await response.json();
         setIsInvalidOrNonExistent(true);
@@ -170,11 +181,46 @@ export function Todo({ title, description, id, done }: TodoProp) {
     }
   }, [id, title, description, handleCatch, handleRequestErrorForDone]);
 
+  const deleteTodo = useCallback(async () => {
+    try {
+      setIsDone(true);
+      const token = localStorage.getItem("jwt");
+      const response = await fetch("http://localhost:4000/api/v1/user/todo", {
+        method: "DELETE",
+        body: JSON.stringify({
+          id: id,
+        }),
+        headers: {
+          "Authorization": "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        const data = await response.json();
+
+        setInvalidMessage(data.msg);
+        setIsInvalidOrNonExistent(true);
+        setIsDone(false);
+        setTimeout(() => {
+          setInvalidMessage("");
+        }, 3000);
+        return;
+      }
+      const data = await response.json();
+      setDoneMessage(data.msg);
+      setTimeout(() => {
+        setDoneMessage("");
+      }, 3000);
+    } catch (error) {
+      handleCatch(error, handleRequestErrorForDelete);
+    }
+  }, [id, handleCatch, handleRequestErrorForDelete]);
+
   if (!isDone) {
     return (
       <>
         <div className=" animate-fadeIn flex gap-6 rounded-xl border-4 border-sexyMaroon px-6 pb-4 pt-2 mx-8 transition-all ease-in-out duration-300 my-4 hover:scale-105">
-          <DeleteButton></DeleteButton>
+          <DeleteButton onClick={deleteTodo}></DeleteButton>
           <div className="basis-full ">
             {isUpdating ? (
               <>

@@ -1,6 +1,12 @@
-export function DeleteButton() {
+interface DeleteButtonProps {
+  onClick: () => void;
+}
+export function DeleteButton({ onClick }: DeleteButtonProps) {
   return (
-    <button className="relative rounded-lg h-6 bg-sexyMaroon text-sexyCream top-2 p-1 left-0 transition-opacity hover:opacity-80 ease-in-out duration-200">
+    <button
+      onClick={onClick}
+      className="relative rounded-lg h-6 bg-sexyMaroon text-sexyCream top-2 p-1 left-0 transition-opacity hover:opacity-80 ease-in-out duration-200"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"

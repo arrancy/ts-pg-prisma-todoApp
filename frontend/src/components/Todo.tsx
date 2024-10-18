@@ -1,6 +1,7 @@
 import { Button } from "./Button";
 import { useState, useCallback, useEffect } from "react";
 import { InputField } from "./InputField";
+import { DeleteButton } from "./DeleteButton";
 export interface TodoProp {
   id: null | number;
   title: string;
@@ -173,6 +174,7 @@ export function Todo({ title, description, id, done }: TodoProp) {
     return (
       <>
         <div className=" animate-fadeIn flex gap-6 rounded-xl border-4 border-sexyMaroon px-6 pb-4 pt-2 mx-8 transition-all ease-in-out duration-300 my-4 hover:scale-105">
+          <DeleteButton></DeleteButton>
           <div className="basis-full ">
             {isUpdating ? (
               <>

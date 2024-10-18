@@ -33,7 +33,7 @@ export function Todo({ title, description, id, done }: TodoProp) {
   }, [title, description]);
 
   const handleRequestErrorForDone = useCallback((errorMessage: string) => {
-    setErrorValue(errorMessage);
+    setErrorValue(errorMessage || "an unknown error occured");
     setHasError(true);
     setIsDone(false);
     setTimeout(() => {
@@ -42,7 +42,7 @@ export function Todo({ title, description, id, done }: TodoProp) {
   }, []);
   const handleRequestErrorForUpdate = useCallback(
     (errorMessage: string) => {
-      setErrorValue(errorMessage);
+      setErrorValue(errorMessage || "an unknown error occured");
       setHasError(true);
       setInitialTodoTitle(backupTitle);
       setInitialTodoDescription(backupDescription);
@@ -65,11 +65,9 @@ export function Todo({ title, description, id, done }: TodoProp) {
     (error: unknown, errorHandler: (errorMessage: string) => void) => {
       if (error instanceof Error) {
         if (error.name === "TypeError" && error.message === "Failed to fetch") {
-          setHasError(true);
-          setErrorValue(
+          errorHandler(
             "The backend server is unreachable. Please try again later."
           );
-          errorHandler("backend server down");
         } else {
           errorHandler(error.message || "an unknown error occured");
         }

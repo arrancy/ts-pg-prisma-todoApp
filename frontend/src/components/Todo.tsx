@@ -95,18 +95,21 @@ export function Todo({ title, description, id, done }: TodoProp) {
       console.log("reached after state logic");
       try {
         const jwt = localStorage.getItem("jwt");
-        const response = await fetch("http://localhost:4000/api/v1/user/todo", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + jwt,
-          },
-          body: JSON.stringify({
-            id: id,
-            title: updatedTodoTitle,
-            description: updatedTodoDescription,
-          }),
-        });
+        const response = await fetch(
+          "https://todobackend-h2grkoksy-ruturajs-projects-5c70c082.vercel.app/api/v1/user/todo",
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + jwt,
+            },
+            body: JSON.stringify({
+              id: id,
+              title: updatedTodoTitle,
+              description: updatedTodoDescription,
+            }),
+          }
+        );
         if (!response.ok) {
           const data = await response.json();
           setIsInvalidOrNonExistent(true);
@@ -148,7 +151,7 @@ export function Todo({ title, description, id, done }: TodoProp) {
     const jwt = localStorage.getItem("jwt");
     try {
       const response = await fetch(
-        "http://localhost:4000/api/v1/user/todo/done",
+        "https://todobackend-h2grkoksy-ruturajs-projects-5c70c082.vercel.app/api/v1/user/todo/done",
         {
           method: "PUT",
           headers: {
@@ -183,16 +186,19 @@ export function Todo({ title, description, id, done }: TodoProp) {
     try {
       setIsDone(true);
       const token = localStorage.getItem("jwt");
-      const response = await fetch("http://localhost:4000/api/v1/user/todo", {
-        method: "DELETE",
-        body: JSON.stringify({
-          id: id,
-        }),
-        headers: {
-          "Authorization": "Bearer " + token,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        "https://todobackend-h2grkoksy-ruturajs-projects-5c70c082.vercel.app/api/v1/user/todo",
+        {
+          method: "DELETE",
+          body: JSON.stringify({
+            id: id,
+          }),
+          headers: {
+            "Authorization": "Bearer " + token,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       if (!response.ok) {
         const data = await response.json();
 

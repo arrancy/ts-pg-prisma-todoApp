@@ -6,11 +6,14 @@ async function getTodos(): Promise<TodoInputFormat[]> {
   if (!token) {
     return [];
   }
-  const response = await fetch("http://localhost:4000/api/v1/user/todo", {
-    headers: {
-      "Authorization": "Bearer " + token,
-    },
-  });
+  const response = await fetch(
+    "https://todobackend-h2grkoksy-ruturajs-projects-5c70c082.vercel.app/api/v1/user/todo",
+    {
+      headers: {
+        "Authorization": "Bearer " + token,
+      },
+    }
+  );
   const data = await response.json();
   return data.todos;
 }

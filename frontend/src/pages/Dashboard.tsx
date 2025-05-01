@@ -21,11 +21,14 @@ export function DashBoard() {
   async function amIAuthenticated() {
     try {
       const token = localStorage.getItem("jwt");
-      const response = await fetch("http://localhost:4000/me", {
-        headers: {
-          "Authorization": "Bearer " + token,
-        },
-      });
+      const response = await fetch(
+        "https://todobackend-h2grkoksy-ruturajs-projects-5c70c082.vercel.app/me",
+        {
+          headers: {
+            "Authorization": "Bearer " + token,
+          },
+        }
+      );
       const data = await response.json();
       if (data.isLoggedIn) {
         setIsLoggedIn(true);
@@ -74,12 +77,6 @@ export function DashBoard() {
               ) : (
                 ""
               )}
-              {/* <Todo
-              title="hello"
-              description="world  slkjdfdsljaslkjdfdsljaslkjdfdsljaslkjdfdsljaslkjdfdsljaslkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja slkjdfdslja"
-              done={false}
-              id={1}
-            ></Todo> */}
             </TodoWrapper>
           </div>
         </div>

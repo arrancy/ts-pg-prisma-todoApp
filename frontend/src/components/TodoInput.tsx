@@ -62,7 +62,7 @@ export function TodoInput() {
               const token = localStorage.getItem("jwt");
               try {
                 const response = await fetch(
-                  "http://localhost:4000/api/v1/user/todo",
+                  "https://todobackend-h2grkoksy-ruturajs-projects-5c70c082.vercel.app/api/v1/user/todo",
                   {
                     method: "POST",
                     body: JSON.stringify(TodoInput),

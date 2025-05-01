@@ -20,11 +20,14 @@ export function Signup() {
       if (!token) {
         return;
       }
-      const response = await fetch("http://localhost:4000/me", {
-        headers: {
-          "Authorization": "Bearer " + token,
-        },
-      });
+      const response = await fetch(
+        "https://todobackend-h2grkoksy-ruturajs-projects-5c70c082.vercel.app/me",
+        {
+          headers: {
+            "Authorization": "Bearer " + token,
+          },
+        }
+      );
       const data = await response.json();
       if (data.isLoggedIn) {
         navigate("/dashboard");
@@ -110,7 +113,7 @@ export function Signup() {
               setIsWaiting(true);
               try {
                 const response = await fetch(
-                  "http://localhost:4000/api/v1/user/signup",
+                  "https://todobackend-h2grkoksy-ruturajs-projects-5c70c082.vercel.app/api/v1/user/signup",
                   {
                     method: "POST",
                     body: JSON.stringify(signupInput),

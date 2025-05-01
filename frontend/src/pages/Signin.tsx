@@ -25,11 +25,14 @@ export function Signin() {
       if (!token) {
         return;
       }
-      const response = await fetch("http://localhost:4000/me", {
-        headers: {
-          "Authorization": "Bearer " + token,
-        },
-      });
+      const response = await fetch(
+        "https://todobackend-h2grkoksy-ruturajs-projects-5c70c082.vercel.app/me",
+        {
+          headers: {
+            "Authorization": "Bearer " + token,
+          },
+        }
+      );
       const data = await response.json();
       if (data.isLoggedIn) {
         navigate("/dashboard");
@@ -99,7 +102,7 @@ export function Signin() {
               try {
                 setWaiting(true);
                 const response = await fetch(
-                  "http://localhost:4000/api/v1/user/signin",
+                  "https://todobackend-h2grkoksy-ruturajs-projects-5c70c082.vercel.app/api/v1/user/signin",
                   {
                     method: "POST",
                     body: JSON.stringify(signinInput),
@@ -118,10 +121,9 @@ export function Signin() {
                 const token = recievedData.token;
                 localStorage.setItem("jwt", token);
                 console.log(token);
-                setTimeout(() => {
-                  setWaiting(false);
-                  navigate("/dashboard");
-                }, 100);
+
+                setWaiting(false);
+                navigate("/dashboard");
                 return;
               } catch (error: unknown) {
                 if (error instanceof Error) {
